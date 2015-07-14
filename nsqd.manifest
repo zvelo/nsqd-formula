@@ -1,0 +1,52 @@
+{% if pillar['nsqd'] is defined -%}
+{
+    "apiVersion": "v1",
+    "kind": "Pod",
+    "metadata": {"name": "nsqd"},
+    "spec": {
+        "hostNetwork": true,
+        "containers": [{
+            "name": "nsqd",
+            "image": "nsqio/nsq",
+            "command": [
+              "/nsqd",
+{% for addr in salt['pillar.get']('nsqd:lookupd-tcp-address', {}) -%}
+              "-lookupd-tcp-address={{addr}}:4160",
+{% endfor -%}
+{% if pillar['nsqd']['broadcast-iface'] is defined -%}
+{% set iface = pillar['nsqd']['broadcast-iface'] -%}
+              "-broadcast-address={{salt['network.ip_addrs'](iface)[0]}}",
+{% endif -%}
+{% if pillar['nsqd']['statsd-address'] is defined -%}
+              "-statsd-address={{pillar['nsqd']['statsd-address']}}:8125",
+{% endif -%}
+{% if pillar['nsqd']['msg-timeout'] is defined -%}
+              "-msg-timeout={{pillar['nsqd']['msg-timeout']}}",
+{% endif -%}
+{% if pillar['nsqd']['mem-queue-size'] is defined -%}
+              "-mem-queue-size={{pillar['nsqd']['mem-queue-size']}}",
+{% endif -%}
+              "-data-path=/data"
+            ],
+            "ports": [{
+                "name": "nsqd-tcp",
+                "containerPort": 4150,
+                "hostPort": 4150
+            },{
+                "name": "nsqd-http",
+                "containerPort": 4151,
+                "hostPort": 4151
+            }],
+            "volumeMounts": [{
+                "name": "data",
+                "mountPath": "/data",
+                "readOnly": false
+            }]
+        }],
+        "volumes": [{
+            "name": "data",
+            "emptyDir": {}
+        }]
+    }
+}
+{% endif -%}
