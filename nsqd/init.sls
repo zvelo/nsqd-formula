@@ -1,6 +1,6 @@
 /etc/kubernetes/manifests/nsqd.manifest:
   file.managed:
-    - source: salt://nsqd-formula/nsqd/nsqd.manifest
+    - source: salt://nsqd/nsqd.manifest
     - template: jinja
     - user: root
     - group: root
