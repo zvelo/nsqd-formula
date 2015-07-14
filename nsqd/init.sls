@@ -7,3 +7,6 @@
     - mode: 644
     - makedirs: true
     - dir_mode: 755
+    - require:
+      - service: docker
+      - service: kubelet
