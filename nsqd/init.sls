@@ -1,3 +1,13 @@
+/var/nsqd:
+  file.directory:
+    - user: root
+    - group: root
+    - dir_mode: 700
+    - recurse:
+      - user
+      - group
+      - mode
+
 /etc/kubernetes/manifests/nsqd.manifest:
   file.managed:
     - source: salt://nsqd/nsqd.manifest
